@@ -27,6 +27,7 @@ my $p = Nagios::Plugin->new(
 $p->add_arg(
     spec => 'host|hostname|H=s',
     help => "-H, --host=<host> ip.add.re.ss or FQDN\n\tdefault: none",
+    default => 'localhost',
 );
 $p->add_arg(
     spec    => 'verbose|v',
