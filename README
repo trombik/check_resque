@@ -1,0 +1,25 @@
+A Nagios/Icinga plugin to check resque.
+
+SUPPORTED OS
+
+    FreeBSD
+
+it's easy to install on other OSes, though.
+
+REQUIREMENTS
+
+    Perl    http://www.perl.org/
+    Redis   http://search.cpan.org/dist/Redis/
+    Nagios::Plugin http://search.cpan.org/dist/Nagios-Plugin/
+
+INSTALL
+
+> make
+> make install
+
+See Makefile to override defaults.
+
+RATIONALE
+
+I'd thought using Nagios::Plugin was bit overkill until when I realized other
+plugins found on the Net were a hack.
