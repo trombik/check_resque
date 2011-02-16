@@ -50,14 +50,14 @@ $p->add_arg(
     default => 15,
 );
 $p->add_arg(
-    spec => 'queue=s',
+    spec => 'queue|q=s',
     help => "--queue queue1,queue2 comma-separated list of queue(s) to monitor"
       . "\tdefault: high,low",
     default => 'high,low',
 );
 
 $p->add_arg(
-    spec => 'timeout=i',
+    spec => 'timeout|t=i',
     help => "--timeout <sec> connect timeout in sec\n\tdefault: 10",
     default => 10,
 );
@@ -131,43 +131,78 @@ __END__
 
 =head1 NAME
 
-check_redis.pl - 
+check_resque - Nagios/Icinga plugins to check resque's queue
 
 =head1 SYNOPSIS
 
-
+    check_resque -H localhost --warning 10 --critical --20
 
 =head1 DESCRIPTION
 
-
+This Nagios/Icinga plugin checks resque's job queue by querying to redis
+key-value database.
 
 =head1 REQUIREMENTS
 
+The following Perl modules are required.
 
+=over
 
-=head1 FUNCTIONS
+=item * Nagios::Plugin
 
+L<http://search.cpan.org/dist/Nagios-Plugin>
 
+=item * Redis
+
+L<http://search.cpan.org/dist/Redis>
+
+=back
 
 =head1 OPTIONS
 
+=over
 
+=item -H, --host <hostname>
 
-=head1 METHODS
+The target redis server. FQDN or ip.add.re.ss. Default is localhost.
 
+=item -p, --port <port>
 
+TCP port number redis is listens on. Default is 6379.
+
+=item -w, --warning <# of queue>
+
+Returns WARNING state when number of any queues exceeds this limit. Default is
+10.
+
+=item -c, --critical <# of queues>
+
+Returns CRITICAL state when number of any queues exceeds this limit. Default is
+15.
+
+=item -q, --queue queue1[,queue2, ...]
+
+Comma-separated list of queue name to monitor. Default is "high,low".
+
+=item -t, --timeout <sec>
+
+TCP connection timeout. This is different from execution timeout. Default is 10
+sec.
+
+=back
 
 =head1 BUGS AND LIMITATIONS
 
-
+IPv6 is not supported because Redis Perl module is using only IO::Socket::INET
+(or you can blame Perl).
 
 =head1 SEE ALSO
 
-
+L<Nagios::Plugin>, L<Redis>
 
 =head1 AUTHOR
 
-Tomoyuki Sakurai <cherry@trombik.org>
+Tomoyuki Sakurai <tomoyukis@reallyenglish.com>
 
 =head1 COPYRIGHT AND LICENSE
 

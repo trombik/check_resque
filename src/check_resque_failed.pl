@@ -49,12 +49,12 @@ $p->add_arg(
     default => 15,
 );
 $p->add_arg(
-    spec => 'queue=s',
+    spec => 'queue|q=s',
     help => "--queue <name_of_failed_queue\n\tdefault: failed",
     default => 'failed',
 );
 $p->add_arg(
-    spec => 'timeout=i',
+    spec => 'timeout|t=i',
     help => "--timeout <sec> connect timeout in sec\n\tdefault: 10",
     default => 10,
 );
@@ -106,43 +106,30 @@ __END__
 
 =head1 NAME
 
-check_redis.pl - 
+check_resque_failed -  Nagios/Icinga plugins to check resque's failed queue
 
 =head1 SYNOPSIS
 
-
+    check_resque_failed -H localhost --warning 10 --critical --20
 
 =head1 DESCRIPTION
 
+This Nagios/Icinga plugin checks resque's failed queue by querying to redis
+key-value database.
 
-
-=head1 REQUIREMENTS
-
-
-
-=head1 FUNCTIONS
-
-
+This plugin shares most of options and others. See also check_resque.
 
 =head1 OPTIONS
 
-
-
-=head1 METHODS
-
-
-
-=head1 BUGS AND LIMITATIONS
-
-
+See check_resque.
 
 =head1 SEE ALSO
 
-
+check_resque
 
 =head1 AUTHOR
 
-Tomoyuki Sakurai <cherry@trombik.org>
+Tomoyuki Sakurai <tomoyukis@reallyenglish.com>
 
 =head1 COPYRIGHT AND LICENSE
 
