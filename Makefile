@@ -1,7 +1,4 @@
 VERSION=	1.0
-INSTALL_CMD?=	/usr/bin/install
-INSTALL_ARGS?=	-C -o root -g wheel -m 0755
-INSTALL=	${INSTALL_CMD} ${INSTALL_ARGS}
 PROJECT_NAME=	check_resque
 RELEASE_NAME=	${PROJECT_NAME}-${VERSION}
 RELEASE_DIR?=	../${RELEASE_NAME}
@@ -16,10 +13,10 @@ all:
 	${MAKE} -C src/${P} all
 
 create-destdir:
-	${INSTALL_CMD} -d ${PLUGINS_DIR}
+	install -d ${PLUGINS_DIR}
 
 install:	create-destdir
-	${MAKE} -C src/${P} install
+	${MAKE} -C src/${P} install PLUGINS_DIR=${PLUGINS_DIR}
 
 clean:
 	${MAKE} -C src/${P} clean

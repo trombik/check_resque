@@ -1,3 +1,6 @@
+INSTALL_CMD?=	/usr/bin/install
+INSTALL_ARGS?=	-C -o root -g wheel -m 0755
+INSTALL=	${INSTALL_CMD} ${INSTALL_ARGS}
 PLUGINS=	check_resque \
 			check_resque_failed
 
@@ -5,7 +8,7 @@ all:	${PLUGINS}
 
 install:
 .for P in ${PLUGINS}
-	${INSTALL} ${P}
+	${INSTALL} ${P} ${PLUGINS_DIR}
 .endfor
 
 check_resque:
