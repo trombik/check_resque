@@ -55,7 +55,12 @@ $p->add_arg(
       . "\tdefault: high,low",
     default => 'high,low',
 );
-
+$p->add_arg(
+    spec => 'namespace=s',
+    help => "--namespace [namespace] prefix of queues to monitor"
+      . "\tdefault: resque:queue",
+    default => 'resque:queue',
+);
 $p->add_arg(
     spec => 'timeout|t=i',
     help => "--timeout <sec> connect timeout in sec\n\tdefault: 10",
@@ -98,7 +103,7 @@ if ( !$r->ping ) {
 }
 
 foreach my $q (@queues) {
-    my $len = $r->llen( sprintf "queue:%s", $q );
+    my $len = $r->llen( sprintf "%s:%s", $p->opts->namespace, $q );
     if ( $len >= $p->opts->critical ) {
         $status{$q} = CRITICAL;
     }
@@ -179,6 +184,12 @@ Returns WARNING state when number of any queues exceeds this limit. Default is
 
 Returns CRITICAL state when number of any queues exceeds this limit. Default is
 15.
+
+=item --namespace <namespace>
+
+Prefix of queues to monitor. Default is "resque:queue"
+
+=cut
 
 =item -q, --queue queue1[,queue2, ...]
 

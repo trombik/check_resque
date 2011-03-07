@@ -54,6 +54,11 @@ $p->add_arg(
     default => 'failed',
 );
 $p->add_arg(
+    spec => 'namespace=s',
+    help => "--namespace <namespace>\n\tdefault: resque:queue",
+    default => 'resque:queue',
+);
+$p->add_arg(
     spec => 'timeout|t=i',
     help => "--timeout <sec> connect timeout in sec\n\tdefault: 10",
     default => 10,
@@ -88,7 +93,7 @@ if ( !$r->ping ) {
 }
 
 my $status = UNKNOWN;
-my $len = $r->llen("queue:failed");
+my $len = $r->llen(sprintf "%s:%s", $p->opts->namespace, $p->opts->queue);
 if ( $len >= $p->opts->critical ) {
     $status = CRITICAL;
 }
