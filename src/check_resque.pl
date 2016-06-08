@@ -1,9 +1,9 @@
 #!/usr/bin/perl 
 #===============================================================================
 #
-#         FILE:  check_redis.pl
+#         FILE:  check_resque.pl
 #
-#        USAGE:  ./check_redis.pl
+#        USAGE:  ./check_resque.pl
 #
 #       AUTHOR:  Tomoyuki Sakurai, <tomoyukis@reallyenglish.com>
 #      CREATED:  02/16/11 08:38:50
@@ -16,6 +16,9 @@ use Nagios::Plugin;
 use Nagios::Plugin::Functions;
 use File::Basename;
 use Redis;
+
+my $z = undef ; 
+my $len = undef;
 
 my $p = Nagios::Plugin->new(
     usage => "Usage; %s [ -v|--verbose ] [ -H <host> ] [ -t <timeout> ]\n"
@@ -30,6 +33,11 @@ $p->add_arg(
     default => 'localhost',
 );
 $p->add_arg(
+    spec => 'database|d=i',
+    help => "-d, --database=<number> num database or \n\tdefault: 0",
+    default => 0,
+);
+$p->add_arg(
     spec    => 'verbose|v',
     help    => "-v, --verbose be verbose\n\tdefault: off",
     default => 0,
@@ -38,6 +46,11 @@ $p->add_arg(
     spec    => 'port|p=i',
     help    => "-p, --port=<port> port\n\tdefault: 6379",
     default => 6379,
+);
+$p->add_arg(
+    spec    => 'password=s',
+    help    => "--password=<password>\n\tdefault: (none)",
+    default => '',
 );
 $p->add_arg(
     spec    => 'warning|w=i',
@@ -74,11 +87,14 @@ my $r;
 eval {
     # XXX Redis dies when connection refused (IO::Socket::INET->new)
     # XXX Redis doesn't handle timeout at all
+    # added password support ala  https://github.com/melo/perl-redis/issues/11 --nick@kavassalis.com
     local $SIG{ALRM} = sub { die "connection timeout\n"; };
     alarm $p->opts->timeout;
     $r = Redis->new(
         server => sprintf( "%s:%d", $p->opts->host, $p->opts->port ),
+	database => $p->opts->database,
         debug  => $p->opts->verbose,
+        password => $p->opts->password,
     );
     alarm 0;
 };
@@ -102,26 +118,37 @@ if ( !$r->ping ) {
     nagios_exit( CRITICAL, "redis->ping failed" );
 }
 
+
+
 foreach my $q (@queues) {
-    my $len = $r->llen( sprintf "%s:%s", $p->opts->namespace, $q );
-    if ( $len >= $p->opts->critical ) {
+#    my $len = $r->llen( sprintf "%s:%s", $p->opts->namespace, $q );
+	$len = $r->llen( sprintf "%s:%s", $p->opts->namespace, $q );
+
+	 if ( $len >= $p->opts->critical ) {
+
         $status{$q} = CRITICAL;
     }
     elsif ( $len >= $p->opts->warning ) {
+ 
         $status{$q} = WARNING;
     }
     else {
+
         $status{$q} = OK;
     }
 }
 
+
+$z = $len ;
+
 my @q_ok       = grep { $status{$_} == OK } keys %status;
 my @q_warning  = grep { $status{$_} == WARNING } keys %status;
 my @q_critical = grep { $status{$_} == CRITICAL } keys %status;
-my $message = sprintf "ok=%s;warning=%s;critical=%s",
+my $message = sprintf " statut @q_ok @q_warning @q_critical $len ",
   join( ',', @q_ok ),
   join( ',', @q_warning ),
   join( ',', @q_critical );
+
 
 my $exit_status = OK;
 if (@q_critical > 0) {
@@ -130,7 +157,12 @@ if (@q_critical > 0) {
 elsif (@q_warning > 0) {
     $exit_status = WARNING;
 }
-nagios_exit($exit_status, $message);
+
+#$z = $len  ; 
+
+#print  $z ; 
+ 
+nagios_exit($exit_status, $message );
 
 __END__
 
@@ -232,4 +264,3 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 =cut
-
